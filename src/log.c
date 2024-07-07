@@ -67,14 +67,12 @@ LoggingLevel logMessage(
     char *timeFormat = ctime(&now);
     timeFormat[strlen(timeFormat) - 1] = '\0';
 
-    // Обработка переменных аргументов
-    char formattedMessage[1024]; // Предположим, что это максимальный размер вашего сообщения
+    char formattedMessage[1024];
     va_list args;
     va_start(args, format);
     vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
     va_end(args);
 
-    // Вывод сообщения
     fprintf(stdout, formatMessage(level), timeFormat, formattedMessage);
 
     setConsoleColor(LOG_COLOR_WHITE);
@@ -84,7 +82,7 @@ LoggingLevel logMessage(
 LoggingLevel logDebug(const char* format, ...) {
     char formattedMessage[1024];
     va_list args;
-    va_start(args, formattedMessage);
+    va_start(args, format);
     vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
     va_end(args);
 
@@ -94,7 +92,7 @@ LoggingLevel logDebug(const char* format, ...) {
 LoggingLevel logInfo(const char* format, ...) {
     char formattedMessage[1024];
     va_list args;
-    va_start(args, formattedMessage);
+    va_start(args, format);
     vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
     va_end(args);
 
@@ -104,7 +102,7 @@ LoggingLevel logInfo(const char* format, ...) {
 LoggingLevel logWarning(const char* format, ...) {
     char formattedMessage[1024];
     va_list args;
-    va_start(args, formattedMessage);
+    va_start(args, format);
     vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
     va_end(args);
 
@@ -114,7 +112,7 @@ LoggingLevel logWarning(const char* format, ...) {
 LoggingLevel logError(const char* format, ...) {
     char formattedMessage[1024];
     va_list args;
-    va_start(args, formattedMessage);
+    va_start(args, format);
     vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
     va_end(args);
 
@@ -124,7 +122,7 @@ LoggingLevel logError(const char* format, ...) {
 LoggingLevel logCritical(const char* format, ...) {
     char formattedMessage[1024];
     va_list args;
-    va_start(args, formattedMessage);
+    va_start(args, format);
     vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
     va_end(args);
 

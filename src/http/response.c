@@ -1,9 +1,9 @@
-#include "response.h"
+#include "../../include/response.h"
 
 #include <stdio.h>
 
-#include "log.h"
-#include "request.h"
+#include "../../include/log.h"
+#include "../../include/request.h"
 
 static const char* DELIMITER = "\r\n";
 

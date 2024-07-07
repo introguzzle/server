@@ -7,9 +7,17 @@
 #include "response.h"
 
 #define PORT 8080
+#define MAX_CLIENTS 30
 #define FATAL 1
 
-Request* acceptConnection();
+typedef struct Server {
+    const SOCKET master;
+
+} Server;
+
+typedef Response* (*Handler)(Request*);
+
+Request* acceptConnection(SOCKET clientSocket);
 Response* handleRequest(const Request* request);
 int sendResponse(Response* response);
 

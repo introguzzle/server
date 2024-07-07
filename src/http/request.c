@@ -33,6 +33,8 @@ HttpRequest* parseHttpRequest(const char* data) {
         size_t tokensCount;
         char** tokens = split(firstLine, " ", &tokensCount);
 
+        request->content = strdup(firstLine);
+
         if (tokensCount >= 3) {
             request->method = parseMethod(tokens[0]);
             request->path = strdup(tokens[1]);

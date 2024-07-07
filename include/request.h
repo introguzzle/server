@@ -16,9 +16,10 @@ typedef enum Method {
 } Method;
 
 typedef struct HttpRequest {
-    Method      method;
-    const char* path;
-    const char* protocol;
+    Method       method;
+    const char*  path;
+    const char*  protocol;
+    const char * content;
 } HttpRequest;
 
 typedef struct Request {

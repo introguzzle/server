@@ -5,6 +5,54 @@
 #include "parsing.h"
 
 #include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
+
+#include "log.h"
+
+char* concat(const int flags, const char* s, ...) {
+    va_list args;
+    va_start(args, s);
+    size_t totalLength = strlen(s) + 1;
+
+    char* str;
+    while ((str = va_arg(args, char*)) != NULL) {
+        if (flags & FLAG_CONCAT_LINE_FEED) {
+            totalLength += 1;
+        }
+
+        if (flags & FLAG_CONCAT_CARRIAGE_RETURN) {
+            totalLength += 1;
+        }
+
+        totalLength += strlen(str);
+    }
+
+    va_end(args);
+
+    char* result = malloc(totalLength);
+    if (result == NULL) {
+        logError("Memory allocation failed");
+        return result;
+    }
+
+    strcpy(result, s);
+
+    va_start(args, s);
+    while ((str = va_arg(args, char*)) != NULL) {
+        if (flags & FLAG_CONCAT_CARRIAGE_RETURN) {
+            strcat(result, "\r");
+        }
+        if (flags & FLAG_CONCAT_LINE_FEED) {
+            strcat(result, "\n");
+        }
+
+        strcat(result, str);
+    }
+    va_end(args);
+
+    return result;
+}
 
 size_t countTokens(const char* s, const char *delimiter) {
     int count = 0;
