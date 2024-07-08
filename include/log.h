@@ -13,6 +13,12 @@
 #define LOG_COLOR_BLUE 9
 #define LOG_COLOR_PINK 13
 
+#define logDebug(format, ...) logMessage(__FILE_NAME__, __LINE__, LOG_LEVEL_DEBUG, format, ##__VA_ARGS__)
+#define logInfo(format, ...) logMessage(__FILE_NAME__, __LINE__, LOG_LEVEL_INFO, format, ##__VA_ARGS__)
+#define logWarning(format, ...) logMessage(__FILE_NAME__, __LINE__, LOG_LEVEL_WARNING, format, ##__VA_ARGS__)
+#define logError(format, ...) logMessage(__FILE_NAME__, __LINE__, LOG_LEVEL_ERROR, format, ##__VA_ARGS__)
+#define logCritical(format, ...) logMessage(__FILE_NAME__, __LINE__, LOG_LEVEL_CRITICAL, format, ##__VA_ARGS__)
+
 typedef enum LoggingLevel {
     LEVEL_DEBUG    = LOG_LEVEL_DEBUG,
     LEVEL_INFO     = LOG_LEVEL_INFO,
@@ -22,13 +28,7 @@ typedef enum LoggingLevel {
 } LoggingLevel;
 
 void setLogLevel(LoggingLevel level);
-LoggingLevel logMessage(LoggingLevel level, const char* format, ...);
-
-LoggingLevel logDebug(const char* format, ...);
-LoggingLevel logInfo(const char* format, ...);
-LoggingLevel logWarning(const char* format, ...);
-LoggingLevel logError(const char* format, ...);
-LoggingLevel logCritical(const char* format, ...);
+LoggingLevel logMessage(const char* file, int line, LoggingLevel level, const char* format, ...);
 
 void debug(const char* message);
 #endif

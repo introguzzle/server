@@ -6,6 +6,7 @@
 #include "log.h"
 #include "parsing.h"
 
+const unsigned int METHOD_ALL = METHOD_GET | METHOD_POST | METHOD_PUT | METHOD_PATCH | METHOD_DELETE;
 const char* methodToString(const Method method) {
     switch (method) {
         case METHOD_GET:
@@ -35,9 +36,11 @@ HttpRequest* parseHttpRequest(const char* data) {
 
         request->content = strdup(firstLine);
 
+        char* path = trim(tokens[1]);
+
         if (tokensCount >= 3) {
             request->method = parseMethod(tokens[0]);
-            request->path = strdup(tokens[1]);
+            request->path = path;
             request->protocol = strdup(tokens[2]);
         }
 
@@ -54,8 +57,11 @@ HttpRequest* parseHttpRequest(const char* data) {
 void logRequest(const Request* request) {
     const char* method = methodToString(request->httpRequest->method);
     const char* path = request->httpRequest->path;
+    const char* ip = request->clientIp;
+    const unsigned short port = request->clientPort;
 
-    logInfo("Received request: %s %s", method, path);
+    logInfo("Received request: %s %s \nIP-address: %s \nPort: %d", method, path, ip, port);
+    logInfo("Request headers");
 }
 
 Method parseMethod(const char* data) {
@@ -77,8 +83,8 @@ Method parseMethod(const char* data) {
     return METHOD_UNKNOWN;
 }
 
-Map* parseHeaders(const char* data) {
-    Map* map = newMap(100);
+StringMap* parseHeaders(const char* data) {
+    StringMap* map = newStringMap(100);
 
     if (map == NULL) {
         return NULL;
@@ -102,7 +108,7 @@ Map* parseHeaders(const char* data) {
             char* key = trim(splitted[0]);
             char* value = trim(splitted[1]);
 
-            mapPut(map, key, value, stringComparator);
+            stringMapPut(map, key, value);
         }
 
         i++;
@@ -123,9 +129,9 @@ Request* parseRequest(const char* data) {
 
 void freeHttpRequest(HttpRequest* request) {
     if (request != NULL) {
-        free((void*) request->method);
-        free((void*) request->path);
-        free((void*) request->protocol);
+        if (request->content != NULL) {
+            free((void*)request->content);
+        }
         free(request);
     }
 }
@@ -133,7 +139,7 @@ void freeHttpRequest(HttpRequest* request) {
 void freeRequest(Request* request) {
     if (request != NULL) {
         freeHttpRequest(request->httpRequest);
-        freeMap(request->headers);
+        freeStringMap(request->headers);
         free(request);
     }
 }

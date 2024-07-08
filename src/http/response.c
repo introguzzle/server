@@ -6,8 +6,7 @@
 #include "../../include/request.h"
 
 static const char* DELIMITER = "\r\n";
-
-const char* formatStatusText(unsigned short status) {
+static const char* formatStatusText(const unsigned short status) {
     switch (status) {
         case 200: return "OK";
         case 201: return "Created";
@@ -20,6 +19,7 @@ const char* formatStatusText(unsigned short status) {
         case 401: return "Unauthorized";
         case 403: return "Forbidden";
         case 404: return "Not Found";
+        case 405: return "Method Not Allowed";
         case 500: return "Internal Server Error";
         case 501: return "Not Implemented";
         case 502: return "Bad Gateway";
@@ -28,7 +28,19 @@ const char* formatStatusText(unsigned short status) {
     }
 }
 
-Response* newResponse(const Request* request, const char* body, const unsigned short status) {
+static char* formatContentType(const ContentType contentType) {
+    switch (contentType) {
+        case CONTENT_TYPE_TEXT_HTML:        return "text/html; charset=utf-8";
+        case CONTENT_TYPE_TEXT_PLAIN:       return "text/plain; charset=utf-8";
+        case CONTENT_TYPE_APPLICATION_JSON: return "application/json; charset=utf-8";
+        case CONTENT_TYPE_APPLICATION_XML:  return "application/xml; charset=utf-8";
+        case CONTENT_TYPE_IMAGE_PNG:        return "image/png";
+        case CONTENT_TYPE_IMAGE_JPEG:       return "image/jpeg";
+        default:                            return "text/plain; charset=utf-8";
+    }
+}
+
+Response* newResponse(const Request* request, const char* body, const unsigned short status, const ContentType contentType) {
     Response* response = malloc(sizeof(Response));
 
     if (response == NULL) {
@@ -36,7 +48,7 @@ Response* newResponse(const Request* request, const char* body, const unsigned s
         return NULL;
     }
 
-    response->headers = newMap(32);
+    response->headers = newStringMap(32);
 
     if (response->headers == NULL) {
         logError("Memory allocation failed for Map.");
@@ -49,7 +61,7 @@ Response* newResponse(const Request* request, const char* body, const unsigned s
     response->body = body;
     response->client = request->client;
 
-    appendHeader(response, "Content-Type", "text/plain");
+    appendHeader(response, "Content-Type", formatContentType(contentType));
 
     char contentLength[256];
     snprintf(contentLength, sizeof(contentLength), "%lu", strlen(body));
@@ -129,14 +141,14 @@ void appendHeader(const Response* response, const char* key, const char* value) 
         return;
     }
 
-    mapPut(response->headers, copiedKey, copiedValue, stringComparator);
+    stringMapPut(response->headers, copiedKey, copiedValue);
 }
 
 void removeHeader(const Response* response, const char* key) {
-    mapRemove(response->headers, key, stringComparator);
+    stringMapRemove(response->headers, key);
 }
 
 void freeResponse(Response* response) {
-    freeMap(response->headers);
+    freeStringMap(response->headers);
     free(response);
 }

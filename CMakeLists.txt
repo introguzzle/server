@@ -16,10 +16,20 @@ add_executable(
         include/parsing.h
         src/parsing.c
         include/response.h
-        src/map.c
-        include/map.h
         src/http/url.c
         include/url.h
+        src/http/dispatch.c
+        include/dispatch.h
+        src/http/controller.c
+        src/http/controller.h
+        src/vector.c
+        include/vector.h
+        src/http/media.c
+        include/media.h
+        src/map/intmap.c
+        include/intmap.h
+        src/map/stringmap.c
+        include/stringmap.h
 )
 if(WIN32)
     target_link_libraries(untitled ws2_32)

@@ -42,21 +42,23 @@ void setLoggingLevel(const LoggingLevel level) {
 char* formatMessage(const LoggingLevel level) {
     switch (level) {
         case LEVEL_DEBUG:
-            return "[DEBUG] [%s] : %s\n";
+            return "[DEBUG] [%s] [File %s on line %d]: %s\n";
         case LEVEL_INFO:
-            return "[INFO] [%s] : %s\n";
+            return "[INFO] [%s] [File %s on line %d]: %s\n";
         case LEVEL_WARNING:
-            return "[WARNING] [%s]: %s\n";
+            return "[WARNING] [%s] [File %s on line %d]: %s\n";
         case LEVEL_ERROR:
-            return "[ERROR] [%s] : %s\n";
+            return "[ERROR] [%s] [File %s on line %d]: %s\n";
         case LEVEL_CRITICAL:
-            return "[CRITICAL] [%s]: %s\n";
+            return "[CRITICAL] [%s] [File %s on line %d]: %s\n";
         default:
-            return "[UNKNOWN] [%s]: %s\n";
+            return "[UNKNOWN] [%s] [File %s on line %d]: %s\n";
     }
 }
 
 LoggingLevel logMessage(
+    const char* file,
+    const int line,
     const LoggingLevel level,
     const char* format,
     ...
@@ -73,62 +75,11 @@ LoggingLevel logMessage(
     vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
     va_end(args);
 
-    fprintf(stdout, formatMessage(level), timeFormat, formattedMessage);
+    fprintf(stdout, formatMessage(level), timeFormat, file, line, formattedMessage);
 
     setConsoleColor(LOG_COLOR_WHITE);
     return level;
 }
-
-LoggingLevel logDebug(const char* format, ...) {
-    char formattedMessage[1024];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
-    va_end(args);
-
-    return logMessage(LOG_LEVEL_DEBUG, formattedMessage, args);
-}
-
-LoggingLevel logInfo(const char* format, ...) {
-    char formattedMessage[1024];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
-    va_end(args);
-
-    return logMessage(LOG_LEVEL_INFO, formattedMessage, args);
-}
-
-LoggingLevel logWarning(const char* format, ...) {
-    char formattedMessage[1024];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
-    va_end(args);
-
-    return logMessage(LOG_LEVEL_WARNING, formattedMessage, args);
-}
-
-LoggingLevel logError(const char* format, ...) {
-    char formattedMessage[1024];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
-    va_end(args);
-
-    return logMessage(LOG_LEVEL_ERROR, formattedMessage, args);
-}
-
-LoggingLevel logCritical(const char* format, ...) {
-    char formattedMessage[1024];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(formattedMessage, sizeof(formattedMessage), format, args);
-    va_end(args);
-
-    return logMessage(LOG_LEVEL_CRITICAL, formattedMessage, args);
-}
-
 
 void debug(const char* message) {
     typedef unsigned short us;

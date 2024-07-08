@@ -91,19 +91,54 @@ build CMakeFiles/untitled.dir/src/parsing.c.obj: C_COMPILER__untitled_unscanned_
   OBJECT_DIR = CMakeFiles\untitled.dir
   OBJECT_FILE_DIR = CMakeFiles\untitled.dir\src
 
-build CMakeFiles/untitled.dir/src/map.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/666/CLionProjects/untitled/src/map.c || cmake_object_order_depends_target_untitled
-  DEP_FILE = CMakeFiles\untitled.dir\src\map.c.obj.d
-  FLAGS = -g -fdiagnostics-color=always
-  INCLUDES = -IC:/Users/666/CLionProjects/untitled/include
-  OBJECT_DIR = CMakeFiles\untitled.dir
-  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\src
-
 build CMakeFiles/untitled.dir/src/http/url.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/666/CLionProjects/untitled/src/http/url.c || cmake_object_order_depends_target_untitled
   DEP_FILE = CMakeFiles\untitled.dir\src\http\url.c.obj.d
   FLAGS = -g -fdiagnostics-color=always
   INCLUDES = -IC:/Users/666/CLionProjects/untitled/include
   OBJECT_DIR = CMakeFiles\untitled.dir
   OBJECT_FILE_DIR = CMakeFiles\untitled.dir\src\http
+
+build CMakeFiles/untitled.dir/src/http/dispatch.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/666/CLionProjects/untitled/src/http/dispatch.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\src\http\dispatch.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/666/CLionProjects/untitled/include
+  OBJECT_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\src\http
+
+build CMakeFiles/untitled.dir/src/http/controller.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/666/CLionProjects/untitled/src/http/controller.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\src\http\controller.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/666/CLionProjects/untitled/include
+  OBJECT_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\src\http
+
+build CMakeFiles/untitled.dir/src/vector.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/666/CLionProjects/untitled/src/vector.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\src\vector.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/666/CLionProjects/untitled/include
+  OBJECT_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\src
+
+build CMakeFiles/untitled.dir/src/http/media.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/666/CLionProjects/untitled/src/http/media.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\src\http\media.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/666/CLionProjects/untitled/include
+  OBJECT_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\src\http
+
+build CMakeFiles/untitled.dir/src/map/intmap.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/666/CLionProjects/untitled/src/map/intmap.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\src\map\intmap.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/666/CLionProjects/untitled/include
+  OBJECT_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\src\map
+
+build CMakeFiles/untitled.dir/src/map/stringmap.c.obj: C_COMPILER__untitled_unscanned_Debug C$:/Users/666/CLionProjects/untitled/src/map/stringmap.c || cmake_object_order_depends_target_untitled
+  DEP_FILE = CMakeFiles\untitled.dir\src\map\stringmap.c.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  INCLUDES = -IC:/Users/666/CLionProjects/untitled/include
+  OBJECT_DIR = CMakeFiles\untitled.dir
+  OBJECT_FILE_DIR = CMakeFiles\untitled.dir\src\map
 
 
 # =============================================================================
@@ -113,7 +148,7 @@ build CMakeFiles/untitled.dir/src/http/url.c.obj: C_COMPILER__untitled_unscanned
 #############################################
 # Link the executable untitled.exe
 
-build untitled.exe: C_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/src/main/main.c.obj CMakeFiles/untitled.dir/src/http/server.c.obj CMakeFiles/untitled.dir/src/log.c.obj CMakeFiles/untitled.dir/src/http/request.c.obj CMakeFiles/untitled.dir/src/http/response.c.obj CMakeFiles/untitled.dir/src/parsing.c.obj CMakeFiles/untitled.dir/src/map.c.obj CMakeFiles/untitled.dir/src/http/url.c.obj
+build untitled.exe: C_EXECUTABLE_LINKER__untitled_Debug CMakeFiles/untitled.dir/src/main/main.c.obj CMakeFiles/untitled.dir/src/http/server.c.obj CMakeFiles/untitled.dir/src/log.c.obj CMakeFiles/untitled.dir/src/http/request.c.obj CMakeFiles/untitled.dir/src/http/response.c.obj CMakeFiles/untitled.dir/src/parsing.c.obj CMakeFiles/untitled.dir/src/http/url.c.obj CMakeFiles/untitled.dir/src/http/dispatch.c.obj CMakeFiles/untitled.dir/src/http/controller.c.obj CMakeFiles/untitled.dir/src/vector.c.obj CMakeFiles/untitled.dir/src/http/media.c.obj CMakeFiles/untitled.dir/src/map/intmap.c.obj CMakeFiles/untitled.dir/src/map/stringmap.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lws2_32  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\untitled.dir
