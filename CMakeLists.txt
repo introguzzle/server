@@ -13,15 +13,15 @@ add_executable(
         src/http/request.c
         include/request.h
         src/http/response.c
-        include/parsing.h
-        src/parsing.c
+        include/strings.h
+        src/parsing/strings.c
         include/response.h
-        src/http/url.c
+        src/parsing/url.c
         include/url.h
         src/http/dispatch.c
         include/dispatch.h
         src/http/controller.c
-        src/http/controller.h
+        include/controller.h
         src/vector.c
         include/vector.h
         src/http/media.c

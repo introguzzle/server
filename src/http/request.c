@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "log.h"
-#include "parsing.h"
+#include "strings.h"
 
 const unsigned int METHOD_ALL = METHOD_GET | METHOD_POST | METHOD_PUT | METHOD_PATCH | METHOD_DELETE;
 const char* methodToString(const Method method) {

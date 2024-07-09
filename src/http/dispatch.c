@@ -6,7 +6,8 @@
 
 #include "intmap.h"
 #include "log.h"
-#include "parsing.h"
+#include "strings.h"
+#include "url.h"
 
 Response* defaultNotFoundHandler(Request* request) {
     return newResponse(request, "Not found", 404, CONTENT_TYPE_TEXT_PLAIN);
@@ -30,11 +31,11 @@ Dispatcher* newDispatcher() {
     return dispatcher;
 }
 
-DispatcherHandler* findDispatcherHandler(Dispatcher* dispatcher, const char* path) {
+DispatcherHandler* findDispatcherHandler(Dispatcher* dispatcher, const Path path) {
     return stringMapGet(dispatcher->handlers, path);
 }
 
-void addHandler(Dispatcher* dispatcher, char* path, Method method, const Handler handler) {
+void addHandler(Dispatcher* dispatcher, const Path path, const Method method, const Handler handler) {
     char* trimmed = trim(path);
     DispatcherHandler* dispatcherHandler = stringMapGet(dispatcher->handlers, trimmed);
 
@@ -54,7 +55,7 @@ void addHandler(Dispatcher* dispatcher, char* path, Method method, const Handler
     logCritical("Registered handler: %s %s", trimmed, methodToString(method));
 }
 
-void clearHandlers(Dispatcher* dispatcher, char* path) {
+void clearHandlers(Dispatcher* dispatcher, const Path path) {
     stringMapRemove(dispatcher->handlers, path);
 }
 

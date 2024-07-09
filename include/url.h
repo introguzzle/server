@@ -5,4 +5,6 @@
 #ifndef URL_H
 #define URL_H
 
+typedef const char* Path;
+
 #endif //URL_H
