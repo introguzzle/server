@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "parsing.h"
+#include "strings.h"
 
 #include <ctype.h>
 #include <stdarg.h>
