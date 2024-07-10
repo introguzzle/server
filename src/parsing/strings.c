@@ -9,14 +9,39 @@
 #include <stdio.h>
 
 #include "log.h"
+#include "vector.h"
 
-char* concat(const int flags, const char* s, ...) {
+char* NewString(const size_t length) {
+    char* s = malloc((length + 1) * sizeof(char));
+    if (s != NULL) {
+        s[0] = '\0';
+        s[length] = '\0';
+    }
+
+    return s;
+}
+
+char* NewStringPrefix(const size_t length, const char* prefix) {
+    char* s = NewString(length);
+
+    if (s != NULL) {
+        s = concat(s, prefix, NULL);
+        s[length] = '\0';
+        return s;
+    }
+
+    return NULL;
+}
+
+char* concatDelim(const int flags, const char* s, ...) {
     va_list args;
     va_start(args, s);
-    size_t totalLength = strlen(s) + 1;
 
+    size_t totalLength = strlen(s) + 1;
     char* str;
-    while ((str = va_arg(args, char*)) != NULL) {
+    va_list args_copy;
+    va_copy(args_copy, args);
+    while ((str = va_arg(args_copy, char*)) != NULL) {
         if (flags & FLAG_CONCAT_LINE_FEED) {
             totalLength += 1;
         }
@@ -27,31 +52,51 @@ char* concat(const int flags, const char* s, ...) {
 
         totalLength += strlen(str);
     }
-
-    va_end(args);
+    va_end(args_copy);
 
     char* result = malloc(totalLength);
     if (result == NULL) {
         logError("Memory allocation failed");
-        return result;
+        va_end(args);
+        return NULL;
     }
 
-    strcpy(result, s);
+    result[0] = '\0';
+    strncat(result, s, totalLength - 1);
 
     va_start(args, s);
+    size_t currentLength = strlen(result);
     while ((str = va_arg(args, char*)) != NULL) {
         if (flags & FLAG_CONCAT_CARRIAGE_RETURN) {
-            strcat(result, "\r");
+            strncat(result, "\r", totalLength - currentLength - 1);
+            currentLength += 1;
         }
         if (flags & FLAG_CONCAT_LINE_FEED) {
-            strcat(result, "\n");
+            strncat(result, "\n", totalLength - currentLength - 1);
+            currentLength += 1;
         }
 
-        strcat(result, str);
+        strncat(result, str, totalLength - currentLength - 1);
+        currentLength += strlen(str);
     }
+
     va_end(args);
 
     return result;
+}
+
+Vector* split(const char* s, const char* delimiter) {
+    Vector* vector = NewVector();
+
+    size_t size;
+    char** splitted = _split(s, delimiter, &size);
+    size_t i = 0;
+    while (splitted[i] != NULL) {
+        VectorPush(vector, splitted[i]);
+        i++;
+    }
+
+    return vector;
 }
 
 size_t countTokens(const char* s, const char *delimiter) {
@@ -101,6 +146,7 @@ char* trim(const char* s) {
 
     return fullyTrimmed;
 }
+
 void freeSplit(char **tokens) {
     for (int i = 0; tokens[i] != NULL; i++) {
         free(tokens[i]);
@@ -108,7 +154,7 @@ void freeSplit(char **tokens) {
     free(tokens);
 }
 
-char** split(const char* s, const char* delimiter, size_t* size) {
+char** _split(const char* s, const char* delimiter, size_t* size) {
     *size = countTokens(s, delimiter);
 
     char** result = malloc((*size + 1) * sizeof(char*));

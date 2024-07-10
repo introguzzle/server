@@ -3,24 +3,34 @@
 #include "server.h"
 #include "dispatch.h"
 #include "request.h"
+#include "json.h"
+#include "strings.h"
 
 Response* get(Request* request) {
-    return newResponse(request, "1337 GET", 200, CONTENT_TYPE_TEXT_PLAIN);
+    return NewResponse(request, "1337 GET", 200, CONTENT_TYPE_TEXT_PLAIN);
 }
 
 Response* post(Request* request) {
-    return newResponse(request, "1337 POST", 200, CONTENT_TYPE_TEXT_PLAIN);
+    const char* encoded = NULL;
+
+    if (request->postParams != NULL && request->postParams->size > 0) {
+        encoded = JSONEncode(request->postParams, 2048);
+    }
+
+    return NewResponse(request, encoded != NULL ? encoded : "1337 POST", 200, CONTENT_TYPE_TEXT_PLAIN);
 }
 
-int main() {
-    Server* server = initializeServer(0, 0);
-    Dispatcher* dispatcher = newDispatcher();
+int main(int argc, char** argv) {
+    Server* server = ServerInitialize(0, 0);
+    Dispatcher* dispatcher = NewDispatcher();
 
     server->dispatcher = dispatcher;
+    const Path path = newPath("api/v1/clowns");
 
-    addHandler(dispatcher, "/api/v1/clowns", METHOD_GET, get);
-    addHandler(dispatcher, "/api/v1/clowns", METHOD_POST, post);
+    AddHandlerToDispatcher(dispatcher, path, METHOD_GET, get);
+    AddHandlerToDispatcher(dispatcher, path, METHOD_POST, post);
 
-    startServer(server);
+    StartServer(server);
+
     return 0;
 }

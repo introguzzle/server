@@ -21,12 +21,12 @@ typedef struct Dispatcher {
     Handler    methodNotAllowedHandler;
 } Dispatcher;
 
-Dispatcher* newDispatcher();
-void addHandler(Dispatcher* dispatcher, Path path, Method method, Handler handler);
-void clearHandlers(Dispatcher* dispatcher, Path path);
-Response* dispatch(Dispatcher* dispatcher, Request* request);
-void freeDispatcher(Dispatcher* dispatcher);
-DispatcherHandler* findDispatcherHandler(Dispatcher* dispatcher, Path path);
+Dispatcher* NewDispatcher();
+void AddHandlerToDispatcher(Dispatcher* dispatcher, Path path, Method method, Handler handler);
+void ClearDispatcherHandlers(Dispatcher* dispatcher, Path path);
+Response* Dispatch(Dispatcher* dispatcher, Request* request);
+void DispatcherDestroy(Dispatcher* dispatcher);
+DispatcherHandler* FindDispatcherHandler(Dispatcher* dispatcher, Path path);
 
 
 #endif //DISPATCH_H

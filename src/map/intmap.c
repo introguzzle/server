@@ -1,9 +1,11 @@
 #include "../include/intmap.h"
 #include <stdlib.h>
 
-#include "log.h"
+IntMap* newIntMap() {
+    return newIntMapCapacity(INT_MAP_INITIAL_CAPACITY);
+}
 
-IntMap* newIntMap(const size_t initialCapacity) {
+IntMap* newIntMapCapacity(const size_t initialCapacity) {
     IntMap* map = malloc(sizeof(IntMap));
     if (map == NULL) {
         return NULL;

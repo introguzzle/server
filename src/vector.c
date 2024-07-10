@@ -5,39 +5,87 @@
 #include "../include/vector.h"
 
 #include <stdlib.h>
+#include <iterable.h>
+#include <stdbool.h>
 
-Vector* newVector() {
+#ifndef VECTOR_MAP_MAGIC_FIELD_DEFINED
+#define VECTOR_MAP_MAGIC_FIELD_DEFINED
+static const long long VECTOR_MAP_MAGIC_FIELD = 872817821L;
+#endif
+
+Vector* NewVector() {
+    return NewVectorCapacity(VECTOR_INITIAL_CAPACITY);
+}
+
+Vector* NewVectorCapacity(const size_t initialCapacity) {
     Vector* vector = malloc(sizeof(Vector));
 
-    vector->items = malloc(sizeof(void*) * VECTOR_INITIAL_CAPACITY);
+    vector->items = malloc(sizeof(void*) * initialCapacity);
     if (vector->items == NULL) {
         free(vector);
         return NULL;
     }
 
     vector->size = 0;
-    vector->capacity = VECTOR_INITIAL_CAPACITY;
+    vector->capacity = initialCapacity;
+    vector->____ = VECTOR_MAP_MAGIC_FIELD;
 
     return vector;
 }
 
-int vectorInsert(Vector* vector, const size_t index, void* item) {
+bool IsVector(void* p) {
+    if (p == NULL) {
+        return false;
+    }
+
+    const Vector* v = p;
+    if (v->____ == VECTOR_MAP_MAGIC_FIELD) {
+        return true;
+    }
+
+    return false;
+}
+
+Vector* VectorReverse(const Vector* vector) {
+    Vector* result = NewVectorCapacity(vector->capacity);
+
+    void* item;
+    foreachReversed(vector, item) {
+        VectorPush(result, item);
+    }
+
+    return result;
+}
+
+bool VectorReverseMutate(Vector* vector) {
+    Vector* result = NewVectorCapacity(vector->capacity);
+
+    void* item;
+    foreachReversed(vector, item) {
+        VectorPush(result, item);
+    }
+
+    vector->items = result->items;
+    return true;
+}
+
+bool VectorInsert(Vector* vector, const size_t index, void* item) {
     if (vector == NULL || vector->items == NULL) {
-        return -1;
+        return false;
     }
 
     if (index > vector->size) {
-        return -1;
+        return false;
     }
 
     if (index == vector->size) {
-        if (vectorPush(vector, item) == -1) {
-            return -1;
+        if (VectorPush(vector, item) == false) {
+            return false;
         }
     } else {
         if (vector->size == vector->capacity) {
-            if (vectorResize(vector, 2 * vector->capacity) == -1)
-                return -1;
+            if (VectorResize(vector, 2 * vector->capacity) == false)
+                return false;
         }
 
         for (int i = vector->size; i > index; i--) {
@@ -48,49 +96,44 @@ int vectorInsert(Vector* vector, const size_t index, void* item) {
         vector->size++;
     }
 
-    return 0;
+    return true;
 }
 
-int vectorResize(Vector* vector, const size_t newCapacity) {
+bool VectorResize(Vector* vector, const size_t newCapacity) {
     void** items = realloc(vector->items, newCapacity * sizeof(void*));
-    if (items == NULL) {
-        return -1;
+    if (vector == NULL || items == NULL) {
+        return false;
     }
 
-    if (items == vector->items) {
-        free(items);
-        return -1;
-    }
-
-    vector->capacity = newCapacity;
     vector->items = items;
+    vector->capacity = newCapacity;
 
-    return 0;
+    return true;
 }
 
-int vectorPush(Vector* vector, void* item) {
+bool VectorPush(Vector* vector, void* item) {
     if (vector == NULL || vector->items == NULL) {
-        return -1;
+        return false;
     }
 
     if (vector->size == vector->capacity) {
-        const int ret = vectorResize(vector, 2 * vector->capacity);
-        if (ret == -1)
-            return -1;
+        const int ret = VectorResize(vector, 2 * vector->capacity);
+        if (ret == false)
+            return false;
     }
 
     vector->items[vector->size++] = item;
 
-    return 0;
+    return true;
 }
 
-int vectorDelete(Vector *vector, const size_t index) {
+bool VectorDelete(Vector *vector, const size_t index) {
     if (vector == NULL || vector->items == NULL) {
-        return -1;
+        return false;
     }
 
     if (index >= vector->size) {
-        return -1;
+        return false;
     }
 
     vector->size--;
@@ -101,15 +144,15 @@ int vectorDelete(Vector *vector, const size_t index) {
 
     const size_t quarter = vector->size == vector->capacity / 4;
     if (quarter && vector->capacity > VECTOR_INITIAL_CAPACITY) {
-        if (vectorResize(vector, vector->capacity / 2) == -1) {
-            return -1;
+        if (VectorResize(vector, vector->capacity / 2) == false) {
+            return false;
         }
     }
 
-    return 0;
+    return true;
 }
 
-void* vectorPop(Vector* vector) {
+void* VectorPop(Vector* vector) {
     if (vector->size == (size_t) 0) {
         return NULL;
     }
@@ -117,26 +160,21 @@ void* vectorPop(Vector* vector) {
     return vector->items[--vector->size];
 }
 
-void freeVector(Vector* vector) {
-    free(vector->items);
-    free(vector);
-}
-
-int vectorContains(Vector* vector, void* item) {
+bool VectorContains(Vector* vector, void* item) {
     if (vector == NULL) {
-        return -1;
+        return false;
     }
 
     for (size_t i = 0; i < vector->size; i++) {
         if (vector->items[i] == item) {
-            return 1;
+            return true;
         }
     }
 
-    return -1;
+    return false;
 }
 
-int vectorIndexOf(Vector* vector, void* item) {
+int VectorIndexOf(Vector* vector, void* item) {
     if (vector == NULL) {
         return -1;
     }
@@ -149,5 +187,19 @@ int vectorIndexOf(Vector* vector, void* item) {
     return -1;
 }
 
+IntMap* VectorToIntMap(Vector* vector) {
+    IntMap* map = newIntMap(vector->capacity);
+
+    for (size_t i = 0; i < vector->size; i++) {
+        intMapPut(map, i, vector->items[i]);
+    }
+
+    return map;
+}
+
+void VectorDestroy(Vector* vector) {
+    free(vector->items);
+    free(vector);
+}
 
 

@@ -32,11 +32,11 @@ typedef struct Server {
 
 } Server;
 
-Request* acceptConnection(Server* server, SOCKET clientSocket);
-Response* handleRequest(Server* server, Request* request);
-int sendResponse(Server* server, Response* response);
+Request* ServerAcceptConnection(Server* server, SOCKET clientSocket);
+Response* ServerHandleRequest(Server* server, Request* request);
+int ServerSendResponse(Server* server, Response* response);
 
-void startServer(Server* server);
-Server* initializeServer(SOCKET master, unsigned short port);
+void StartServer(Server* server);
+Server* ServerInitialize(SOCKET master, unsigned short port);
 
 #endif

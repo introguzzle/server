@@ -4,33 +4,36 @@ project(untitled C)
 set(CMAKE_C_STANDARD 17)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
-add_executable(
-        untitled src/main/main.c
-        src/http/server.c
-        include/server.h
-        src/log.c
-        include/log.h
-        src/http/request.c
-        include/request.h
-        src/http/response.c
-        include/strings.h
-        src/parsing/strings.c
-        include/response.h
-        src/parsing/url.c
-        include/url.h
-        src/http/dispatch.c
-        include/dispatch.h
-        src/http/controller.c
-        include/controller.h
+
+file(GLOB SOURCES
+        src/*.c
+        src/http/*.c
+        src/http/request/*.c
+        src/parsing/*.c
+        src/map/*.c
         src/vector.c
-        include/vector.h
+        src/http/common/content-type.c
         src/http/media.c
-        include/media.h
-        src/map/intmap.c
-        include/intmap.h
-        src/map/stringmap.c
-        include/stringmap.h
+        third-party/cJSON.c
+        third-party/cJSON_Utils.c
 )
+
+file(GLOB HEADERS
+        include/*.h
+        include/http/*.h
+        include/http/request/*.h
+        include/parsing/*.h
+        include/map/*.h
+        include/vector.h
+        include/http/media.h
+        include/iterable.h
+        third-party/cJSON.h
+        third-party/cJSON_Utils.h
+)
+
+add_executable(untitled ${SOURCES} ${HEADERS}
+        src/main/main.c)
+
 if(WIN32)
     target_link_libraries(untitled ws2_32)
 endif()

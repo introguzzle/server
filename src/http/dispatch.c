@@ -9,35 +9,35 @@
 #include "strings.h"
 #include "url.h"
 
-Response* defaultNotFoundHandler(Request* request) {
-    return newResponse(request, "Not found", 404, CONTENT_TYPE_TEXT_PLAIN);
+Response* DefaultNotFoundHandler(Request* request) {
+    return NewResponse(request, "Not found", 404, CONTENT_TYPE_TEXT_PLAIN);
 }
 
-Response* defaultMethodNotAllowedHandler(Request* request) {
-    return newResponse(request, "Method not allowed", 405, CONTENT_TYPE_TEXT_PLAIN);
+Response* DefaultMethodNotAllowedHandler(Request* request) {
+    return NewResponse(request, "Method not allowed", 405, CONTENT_TYPE_TEXT_PLAIN);
 }
 
-Dispatcher* newDispatcher() {
+Dispatcher* NewDispatcher() {
     Dispatcher* dispatcher = malloc(sizeof(Dispatcher));
     if (dispatcher == NULL) {
         logError("Failed to allocate memory for Dispatcher");
         return NULL;
     }
 
-    dispatcher->handlers = newStringMap(10);
-    dispatcher->notFoundHandler = defaultNotFoundHandler;
-    dispatcher->methodNotAllowedHandler = defaultMethodNotAllowedHandler;
+    dispatcher->handlers = NewStringMap();
+    dispatcher->notFoundHandler = DefaultNotFoundHandler;
+    dispatcher->methodNotAllowedHandler = DefaultMethodNotAllowedHandler;
 
     return dispatcher;
 }
 
-DispatcherHandler* findDispatcherHandler(Dispatcher* dispatcher, const Path path) {
-    return stringMapGet(dispatcher->handlers, path);
+DispatcherHandler* FindDispatcherHandler(Dispatcher* dispatcher, const Path path) {
+    return StringMapGet(dispatcher->handlers, path);
 }
 
-void addHandler(Dispatcher* dispatcher, const Path path, const Method method, const Handler handler) {
+void AddHandlerToDispatcher(Dispatcher* dispatcher, const Path path, const Method method, const Handler handler) {
     char* trimmed = trim(path);
-    DispatcherHandler* dispatcherHandler = stringMapGet(dispatcher->handlers, trimmed);
+    DispatcherHandler* dispatcherHandler = StringMapGet(dispatcher->handlers, trimmed);
 
     if (dispatcherHandler == NULL) {
         dispatcherHandler = malloc(sizeof(DispatcherHandler));
@@ -48,19 +48,19 @@ void addHandler(Dispatcher* dispatcher, const Path path, const Method method, co
         }
 
         dispatcherHandler->handlers = newIntMap(10);
-        stringMapPut(dispatcher->handlers, trimmed, dispatcherHandler);
+        StringMapPut(dispatcher->handlers, trimmed, dispatcherHandler);
     }
 
     intMapPut(dispatcherHandler->handlers, method, handler);
-    logCritical("Registered handler: %s %s", trimmed, methodToString(method));
+    logCritical("Registered handler: %s %s", trimmed, MethodToString(method));
 }
 
-void clearHandlers(Dispatcher* dispatcher, const Path path) {
-    stringMapRemove(dispatcher->handlers, path);
+void ClearDispatcherHandlers(Dispatcher* dispatcher, const Path path) {
+    StringMapRemove(dispatcher->handlers, path);
 }
 
-Response* dispatch(Dispatcher* dispatcher, Request* request) {
-    const DispatcherHandler* handler = stringMapGet(dispatcher->handlers, request->httpRequest->path);
+Response* Dispatch(Dispatcher* dispatcher, Request* request) {
+    const DispatcherHandler* handler = StringMapGet(dispatcher->handlers, request->httpRequest->path);
 
     if (handler == NULL) {
         logCritical("Couldn't find handler associated with path: %s", request->httpRequest->path);
@@ -70,16 +70,16 @@ Response* dispatch(Dispatcher* dispatcher, Request* request) {
 
     const Handler matchedHandler = intMapGet(handler->handlers, request->httpRequest->method);
     if (matchedHandler != NULL) {
-        logInfo("Matched method: %s", methodToString(request->httpRequest->method));
+        logInfo("Matched method: %s", MethodToString(request->httpRequest->method));
         return matchedHandler(request);
     }
 
-    logCritical("Couldn't find associated handler with following method: %s", methodToString(request->httpRequest->method));
+    logCritical("Couldn't find associated handler with following method: %s", MethodToString(request->httpRequest->method));
     logCritical("Fallback to method not allowed handler");
     return dispatcher->methodNotAllowedHandler(request);
 }
 
-void freeDispatcher(Dispatcher* dispatcher) {
-    freeStringMap(dispatcher->handlers);
+void DispatcherDestroy(Dispatcher* dispatcher) {
+    StringMapDestroy(dispatcher->handlers);
     free(dispatcher);
 }

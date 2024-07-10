@@ -8,7 +8,7 @@
 #include "../../include/server.h"
 #include "../../include/request.h"
 
-struct WSAData initializeWSAData() {
+struct WSAData InitializeWSAData() {
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
         logCritical("WSAStartup failed: %d", WSAGetLastError());
@@ -19,7 +19,7 @@ struct WSAData initializeWSAData() {
     return wsaData;
 }
 
-Request* acceptConnection(Server* server, const SOCKET clientSocket) {
+Request* ServerAcceptConnection(Server* server, const SOCKET clientSocket) {
     char incoming[1024];
     const int bytesReceived = recv(clientSocket, incoming, sizeof(incoming) - 1, 0);
 
@@ -29,7 +29,7 @@ Request* acceptConnection(Server* server, const SOCKET clientSocket) {
 
     incoming[bytesReceived] = '\0';
 
-    Request* request = parseRequest(incoming);
+    Request* request = ParseRequest(incoming);
     request->client = clientSocket;
 
     struct sockaddr_in clientAddr;
@@ -49,21 +49,21 @@ Request* acceptConnection(Server* server, const SOCKET clientSocket) {
     return request;
 }
 
-Response* handleRequest(Server* server, Request* request) {
-    Response* response = dispatch(server->dispatcher, request);
+Response* ServerHandleRequest(Server* server, Request* request) {
+    Response* response = Dispatch(server->dispatcher, request);
     return response;
 }
 
-int sendResponse(Server* server, Response* response) {
-    char* buffer = createBuffer(response);
+int ServerSendResponse(Server* server, Response* response) {
+    char* buffer = CreateBuffer(response);
     const int bytesSent = send(response->client, buffer, strlen(buffer), 0);
 
     free(buffer);
     return bytesSent;
 }
 
-Server* initializeServer(const SOCKET master, const unsigned short port) {
-    initializeWSAData();
+Server* ServerInitialize(const SOCKET master, const unsigned short port) {
+    InitializeWSAData();
     Server* server = malloc(sizeof(Server));
 
     if (master == 0) {
@@ -121,7 +121,7 @@ Server* initializeServer(const SOCKET master, const unsigned short port) {
     return server;
 }
 
-void startServer(Server* server) {
+void StartServer(Server* server) {
     logInfo("Listening for connections... Socket: %d", server->master);
 
     signal(SIGINT, signalHandler);
@@ -171,22 +171,22 @@ void startServer(Server* server) {
         for (int i = 0; i < DEFAULT_MAX_CLIENTS; i++) {
             const SOCKET clientSocket = server->clients[i];
             if (FD_ISSET(clientSocket, &set)) {
-                Request* request = acceptConnection(server, clientSocket);
+                Request* request = ServerAcceptConnection(server, clientSocket);
                 if (request == NULL) {
                     closesocket(clientSocket);
                     server->clients[i] = 0;
                     continue;
                 }
 
-                logRequest(request);
+                LogRequest(request);
 
-                Response* response = handleRequest(server, request);
+                Response* response = ServerHandleRequest(server, request);
                 logInfo("Response created");
-                sendResponse(server, response);
+                ServerSendResponse(server, response);
                 logInfo("Response sent");
 
-                freeRequest(request);
-                freeResponse(response);
+                RequestDestroy(request);
+                ResponseDestroy(response);
             }
         }
     }

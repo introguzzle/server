@@ -6,6 +6,8 @@
 #define INTMAP_H
 #include <stddef.h>
 
+#define INT_MAP_INITIAL_CAPACITY (size_t) 1 << 3
+
 typedef void* (*IntMapFunction)(size_t, const void*);
 typedef void (*IntMapConsumer)(size_t, const void*);
 
@@ -20,7 +22,8 @@ typedef struct IntMap {
     size_t   capacity;
 } IntMap;
 
-IntMap* newIntMap(size_t initialCapacity);
+IntMap* newIntMap();
+IntMap* newIntMapCapacity(size_t initialCapacity);
 int intMapPut(IntMap* map, size_t key, void* value);
 void* intMapGet(const IntMap* map, size_t key);
 void* intMapCompute(IntMap* map, size_t key, IntMapFunction remappingFunction);

@@ -2,20 +2,13 @@
 #define RESPONSE_H
 
 #include <winsock2.h>
+
+#include "content-type.h"
+#include "httpcode.h"
 #include "request.h"
 
-typedef enum ContentType {
-    CONTENT_TYPE_TEXT_HTML,        // text/html; charset=utf-8
-    CONTENT_TYPE_TEXT_PLAIN,       // text/plain; charset=utf-8
-    CONTENT_TYPE_APPLICATION_JSON, // application/json; charset=utf-8
-    CONTENT_TYPE_APPLICATION_XML,  // application/xml; charset=utf-8
-    CONTENT_TYPE_IMAGE_PNG,        // image/png
-    CONTENT_TYPE_IMAGE_JPEG,       // image/jpeg
-    CONTENT_TYPE_UNKNOWN           // Unknown content type
-} ContentType;
-
 typedef struct Response {
-    unsigned short status;
+    HttpStatus     status;
     const char*    statusText;
     StringMap*     headers;
     const char*    body;
@@ -23,13 +16,12 @@ typedef struct Response {
     SOCKET         client;
 } Response;
 
-Response* newResponse(const Request* request, const char* body, unsigned short status, ContentType contentType);
-int determineSize(Response* response);
-char* createBuffer(Response* response);
+Response* NewResponse(const Request* request, const char* body, HttpStatus status, ContentType contentType);
+char* CreateBuffer(Response* response);
 
-void appendHeader(const Response* response, const char* key, const char* value);
-void removeHeader(const Response* response, const char* key);
+void AppendHeader(const Response* response, const char* key, const char* value);
+void RemoveHeader(const Response* response, const char* key);
 
-void freeResponse(Response* response);
+void ResponseDestroy(Response* response);
 
 #endif // RESPONSE_H
