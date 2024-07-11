@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "iterable.h"
+#include <stdbool.h>
 
 // This field is for determining if void* pointers are actually this struct
 static const long long STRING_MAP_MAGIC_FIELD = 21728121;
@@ -31,16 +32,16 @@ StringMap* NewStringMapCapacity(const size_t initialCapacity) {
 
 int IsStringMap(void* p) {
     if (p == NULL) {
-        return 0;
+        return false;
     }
 
     const StringMap* m = p;
 
     if (m->____ == STRING_MAP_MAGIC_FIELD) {
-        return 1;
+        return true;
     }
 
-    return 0;
+    return false;
 }
 
 static int StringMapFindKey(const StringMap* map, const char* key) {
@@ -49,6 +50,7 @@ static int StringMapFindKey(const StringMap* map, const char* key) {
             return i;
         }
     }
+
     return -1;
 }
 
@@ -56,14 +58,14 @@ int StringMapPut(StringMap* map, const char* key, void* value) {
     const int index = StringMapFindKey(map, key);
     if (index != -1) {
         map->items[index].value = value;
-        return 0;
+        return true;
     }
 
     if (map->size == map->capacity) {
         const size_t newCapacity = map->capacity * 2;
         StringPair* newItems = realloc(map->items, newCapacity * sizeof(StringPair));
         if (newItems == NULL) {
-            return -1;
+            return false;
         }
         map->items = newItems;
         map->capacity = newCapacity;
@@ -71,11 +73,11 @@ int StringMapPut(StringMap* map, const char* key, void* value) {
 
     map->items[map->size].key = strdup(key);
     if (map->items[map->size].key == NULL) {
-        return -1;
+        return false;
     }
     map->items[map->size].value = value;
     map->size++;
-    return 0;
+    return true;
 }
 
 void* StringMapGet(const StringMap* map, const char* key) {
@@ -122,7 +124,7 @@ void StringMapIterate(const StringMap* map, const StringMapConsumer consumer) {
 int StringMapRemove(StringMap* map, const char* key) {
     const int index = StringMapFindKey(map, key);
     if (index == -1) {
-        return -1;
+        return false;
     }
 
     for (size_t i = index; i < map->size - 1; ++i) {
@@ -130,18 +132,18 @@ int StringMapRemove(StringMap* map, const char* key) {
     }
 
     map->size--;
-    return 0;
+    return true;
 }
 
 int StringMapContainsKey(StringMap* map, const char* key) {
     StringPair pair;
     foreach(map, pair) {
         if (strcmp(pair.key, key)) {
-            return 1;
+            return true;
         }
     }
 
-    return -1;
+    return false;
 }
 
 int StringMapIndexOfKey(StringMap* map, const char* key) {

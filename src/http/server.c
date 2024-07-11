@@ -62,7 +62,7 @@ int ServerSendResponse(Server* server, Response* response) {
     return bytesSent;
 }
 
-Server* ServerInitialize(const SOCKET master, const unsigned short port) {
+Server* ServerInitialize(const SOCKET master, const unsigned short port, const size_t maxClients) {
     InitializeWSAData();
     Server* server = malloc(sizeof(Server));
 
@@ -78,6 +78,11 @@ Server* ServerInitialize(const SOCKET master, const unsigned short port) {
         server->port = port;
     }
 
+    if (maxClients == 0) {
+        server->maxClients = (size_t) DEFAULT_MAX_CLIENTS;
+        server->clients = malloc(sizeof(int) * server->maxClients);
+    }
+
     if (server->master == INVALID_SOCKET) {
         logCritical("Socket creation failed.");
         WSACleanup();
@@ -91,7 +96,7 @@ Server* ServerInitialize(const SOCKET master, const unsigned short port) {
         exit(FATAL);
     }
 
-    for (int i = 0; i < DEFAULT_MAX_CLIENTS; i++) {
+    for (int i = 0; i < server->maxClients; i++) {
         server->clients[i] = 0;
     }
 
@@ -132,7 +137,7 @@ void StartServer(Server* server) {
 
         int maxSocketDescriptor = server->master;
 
-        for (int i = 0; i < DEFAULT_MAX_CLIENTS; i++) {
+        for (size_t i = 0; i < server->maxClients; i++) {
             const SOCKET clientSocket = server->clients[i];
             if (clientSocket > 0) {
                 FD_SET(clientSocket, &set);
@@ -160,7 +165,7 @@ void StartServer(Server* server) {
 
             logInfo("New connection, socket is %d", newSocket);
 
-            for (int i = 0; i < DEFAULT_MAX_CLIENTS; i++) {
+            for (size_t i = 0; i < server->maxClients; i++) {
                 if (server->clients[i] == 0) {
                     server->clients[i] = newSocket;
                     break;
@@ -168,7 +173,7 @@ void StartServer(Server* server) {
             }
         }
 
-        for (int i = 0; i < DEFAULT_MAX_CLIENTS; i++) {
+        for (size_t i = 0; i < server->maxClients; i++) {
             const SOCKET clientSocket = server->clients[i];
             if (FD_ISSET(clientSocket, &set)) {
                 Request* request = ServerAcceptConnection(server, clientSocket);

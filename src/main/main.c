@@ -7,7 +7,13 @@
 #include "strings.h"
 
 Response* get(Request* request) {
-    return NewResponse(request, "1337 GET", 200, CONTENT_TYPE_TEXT_PLAIN);
+    Response* response = NewHTMLResponse(request, "index.html", HTTP_STATUS_OK);
+
+    StringMap* data = NewStringMap();
+    StringMapPut(data, "$title", "TITLE");
+    StringMapPut(data, "$body", "BODY");
+
+    return ResponseWithData(response, data);
 }
 
 Response* post(Request* request) {
@@ -21,7 +27,7 @@ Response* post(Request* request) {
 }
 
 int main(int argc, char** argv) {
-    Server* server = ServerInitialize(0, 0);
+    Server* server = ServerInitialize(0, 0, 0);
     Dispatcher* dispatcher = NewDispatcher();
 
     server->dispatcher = dispatcher;

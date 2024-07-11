@@ -17,6 +17,9 @@ typedef struct Response {
 } Response;
 
 Response* NewResponse(const Request* request, const char* body, HttpStatus status, ContentType contentType);
+Response* NewHTMLResponse(const Request* request, const char* name, HttpStatus status);
+Response* ResponseWithData(Response* response, const StringMap* data);
+
 char* CreateBuffer(Response* response);
 
 void AppendHeader(const Response* response, const char* key, const char* value);

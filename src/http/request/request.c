@@ -8,6 +8,7 @@
 #include "log.h"
 #include "strings.h"
 #include "url.h"
+#include "content-type.h"
 
 static Protocol* ParseProtocol(const char* protocolData) {
     // HTTP/1.1
@@ -110,8 +111,6 @@ Request* ParseRequest(const char* data) {
     request->headers = ParseRequestHeaders(data);
     request->queryParams = ParseQueryParameters(request->httpRequest->path);
 
-    int isJson = false;
-
     // POST / HTTP/1.1
     // Host: foo.com
     // Content-Type: application/x-www-form-urlencoded
@@ -128,24 +127,15 @@ Request* ParseRequest(const char* data) {
 
     request->body = strdup(bodyStart);
 
-    const char* contentType = StringMapGet(request->headers, "Content-Type");
+    const ContentType contentType = StringToContentType(StringMapGet(request->headers, "Content-Type"));
+    const int isJson = contentType == CONTENT_TYPE_APPLICATION_JSON;
 
-    if (strcmp(contentType, "application/json") == 0) {
-        isJson = 1;
-    }
-
-    logCritical("Content-Type:%s", contentType);
-    logCritical("request->httpRequest->method:%d", request->httpRequest->method);
-    logCritical("METHOD_POST:%d", METHOD_POST);
-    logCritical("isJson:%d", isJson);
+    request->postParams = NewStringMap();
 
     if (request->httpRequest->method == METHOD_POST && isJson) {
         if (request->body && strlen(request->body) > 0) {
             request->postParams = JSONDecode(request->body);
         }
-
-    } else {
-        request->postParams = NewStringMap();
     }
 
     return request;

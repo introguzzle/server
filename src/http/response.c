@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include "iterable.h"
+#include "strings.h"
 #include "../../include/log.h"
 #include "../../include/request.h"
 #include "../../include/content-type.h"
@@ -39,7 +41,76 @@ Response* NewResponse(const Request* request, const char* body, const HttpStatus
     return response;
 }
 
-char* formatStatusLine(const Response* response) {
+static char* ResponseReplacePlaceholder(const char* template, const char* key, const char* value) {
+    const char* placeholder = concat("{{ ", key, " }}", NULL);
+    const char* pos = strstr(template, placeholder);
+    if (pos == NULL) {
+        return strdup(template);
+    }
+
+    const size_t newLength = strlen(template) - strlen(placeholder) + strlen(value);
+    char* result = malloc(newLength + 1);
+    if (result == NULL) {
+        logCritical("Memory allocation failed when replacing placeholders");
+        return NULL;
+    }
+
+    const size_t prefixLength = pos - template;
+
+    strncpy(result, template, prefixLength);
+    strcpy(result + prefixLength, value);
+    strcpy(result + prefixLength + strlen(value), pos + strlen(placeholder));
+
+    return result;
+}
+
+Response* ResponseWithData(Response* response, const StringMap* data) {
+    StringPair pair;
+    foreach(data, pair) {
+        response->body = ResponseReplacePlaceholder(response->body, pair.key, pair.value);
+    }
+
+    return response;
+}
+
+/**
+ *
+ * @param request
+ * @param name
+ * @param status
+ * @return
+ */
+Response* NewHTMLResponse(const Request* request, const char* name, const HttpStatus status) {
+    char* path = concat("../resources/", name);
+
+    FILE* f = fopen(path, "r");
+    if (f == NULL) {
+        logCritical("File not found. Path: %s", path);
+        return NULL;
+    }
+
+    fseek(f, 0, SEEK_END);
+    const long fileSize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    char* content = malloc(fileSize + 1);
+    if (content == NULL) {
+        logCritical("Memory allocation failed");
+        fclose(f);
+        return NULL;
+    }
+
+    fread(content, 1, fileSize, f);
+    content[fileSize] = '\0';
+    fclose(f);
+    logCritical("File contents:\n%s\n", content);
+
+    Response* response = NewResponse(request, strdup(content), status, CONTENT_TYPE_TEXT_HTML);
+    free(content);
+    return response;
+}
+
+char* FormatStatusLine(const Response* response) {
     const char* statusFormat = "HTTP/1.1 %d %s\r\n";
     char *statusBuffer = malloc(strlen(statusFormat) + sizeof(response->status) + strlen(response->statusText));
 
@@ -57,18 +128,19 @@ static int DetermineSize(Response* response) {
     const size_t bodyLength = strlen(response->body);
 
     for (size_t i = 0; i < response->headers->size; i++) {
-        const char *key = response->headers->items[i].key;
+        const char* key = response->headers->items[i].key;
         const char* value = response->headers->items[i].value;
         headersLength += strlen(key) + strlen(value) + 4;
     }
 
     response->size = headersLength + bodyLength + 4 + 1;
+    logCritical("Response size: %d", response->size);
     return response->size;
 }
 
 char* CreateBuffer(Response* response) {
     DetermineSize(response);
-    const char* statusLine = formatStatusLine(response);
+    const char* statusLine = FormatStatusLine(response);
     char* buffer = malloc(response->size + strlen(statusLine));
 
     if (buffer == NULL) {
@@ -82,7 +154,7 @@ char* CreateBuffer(Response* response) {
     strcat(buffer, statusLine);
 
     for (size_t i = 0; i < response->headers->size; i++) {
-        const char *key = response->headers->items[i].key;
+        const char* key = response->headers->items[i].key;
         const char* value = response->headers->items[i].value;
 
         strcat(buffer, key);
@@ -90,6 +162,8 @@ char* CreateBuffer(Response* response) {
         strcat(buffer, value);
         strcat(buffer, DELIMITER);
     }
+
+    logInfo("Headers appended");
 
     strcat(buffer, DELIMITER);
     strcat(buffer, response->body);

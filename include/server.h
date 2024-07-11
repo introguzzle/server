@@ -24,12 +24,12 @@ typedef struct Server {
 
     struct sockaddr_in    address;
     int                   port;
-    int                   clients[DEFAULT_MAX_CLIENTS];
+    int*                  clients;
+    size_t                maxClients;
 
     Dispatcher*           dispatcher;
 
     CRITICAL_SECTION      mutex;
-
 } Server;
 
 Request* ServerAcceptConnection(Server* server, SOCKET clientSocket);
@@ -37,6 +37,6 @@ Response* ServerHandleRequest(Server* server, Request* request);
 int ServerSendResponse(Server* server, Response* response);
 
 void StartServer(Server* server);
-Server* ServerInitialize(SOCKET master, unsigned short port);
+Server* ServerInitialize(SOCKET master, unsigned short port, size_t maxClients);
 
 #endif

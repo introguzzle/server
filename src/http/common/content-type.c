@@ -7,19 +7,24 @@
 
 char* FormatContentType(const ContentType contentType) {
     switch (contentType) {
-        case CONTENT_TYPE_TEXT_HTML:           return "text/html; charset=utf-8";
-        case CONTENT_TYPE_TEXT_PLAIN:          return "text/plain; charset=utf-8";
-        case CONTENT_TYPE_APPLICATION_JSON:    return "application/json; charset=utf-8";
-        case CONTENT_TYPE_APPLICATION_XML:     return "application/xml; charset=utf-8";
-        case CONTENT_TYPE_FORM_URLENCODED:     return "application/x-www-form-urlencoded";
-        case CONTENT_TYPE_MULTIPART_FORM_DATA: return "multipart/form-data";
-        case CONTENT_TYPE_IMAGE_PNG:           return "image/png";
-        case CONTENT_TYPE_IMAGE_JPEG:          return "image/jpeg";
-        default:                               return "text/plain; charset=utf-8";
+        case CONTENT_TYPE_TEXT_HTML:                return "text/html; charset=utf-8";
+        case CONTENT_TYPE_TEXT_PLAIN:               return "text/plain; charset=utf-8";
+        case CONTENT_TYPE_APPLICATION_JSON:         return "application/json; charset=utf-8";
+        case CONTENT_TYPE_APPLICATION_XML:          return "application/xml; charset=utf-8";
+        case CONTENT_TYPE_FORM_URLENCODED:          return "application/x-www-form-urlencoded";
+        case CONTENT_TYPE_MULTIPART_FORM_DATA:      return "multipart/form-data";
+        case CONTENT_TYPE_APPLICATION_OCTET_STREAM: return "application/octet-stream";
+        case CONTENT_TYPE_IMAGE_PNG:                return "image/png";
+        case CONTENT_TYPE_IMAGE_JPEG:               return "image/jpeg";
+        default:                                    return "text/plain; charset=utf-8";
     }
 }
 
 ContentType StringToContentType(const char* contentType) {
+    if (contentType == NULL) {
+        return CONTENT_TYPE_UNKNOWN;
+    }
+
     if (strcmp(contentType, "application/json") == 0) {
         return CONTENT_TYPE_JSON;
     }
